@@ -48,8 +48,20 @@ python3 -m http.server 8000
 
 ## Design system
 
+Playful launchpad style (chunky type, pill controls, hard offset shadows, cream page with dark bands), in Saviour's own rescue orange.
+
 | Token | Hex | Use |
 |---|---|---|
+| Paper | `#F7F5EE` | Page background |
+| Ink | `#141210` | Text, outlines, hard shadows (`2px 2px 0`) |
+| Rescue orange | `#FF4F00` | Header, primary buttons, highlights, burn |
+| Sand | `#E6E3D8` / `#CFCBBD` | Card borders, dividers |
+| Band | `#0E0E0E` / `#161616` | Dark sections (lock board, footer) |
+| Up / down | `#2ED37A` / `#F0565B` | Locked / flagged states |
+
+Type: **Archivo Black** (uppercase hero), **Titan One** (display headings), **Plus Jakarta Sans** (UI), **IBM Plex Mono** (data), **Shantell Sans** (hand-drawn notes).
+
+---|---|---|
 | Ink | `#0E0D0B` | Background |
 | Bone | `#EDE6D6` | Text |
 | Rescue orange | `#FF4F00` | The only accent: CTAs, emphasis, burn |

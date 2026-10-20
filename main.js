@@ -91,13 +91,27 @@ const list = $("[data-lock-list]");
 const out = $("[data-lock-out]");
 const form = $("[data-lock-form]");
 
+const lockedCount = $("[data-locked-count]");
+const AVATAR_COLOURS = ["#FF4F00", "#FFB37A", "#2ED37A", "#F0565B", "#E6E3D8", "#FDDA26", "#8FB8FF"];
+function avatarColour(t) {
+  let h = 0;
+  for (const c of t) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return AVATAR_COLOURS[h % AVATAR_COLOURS.length];
+}
+
 function renderList() {
   const t = Date.now();
   for (const [k, v] of registry) if (v.until <= t) registry.delete(k);
   list.innerHTML = [...registry.values()]
     .sort((a, b) => b.until - a.until)
-    .map((v) => `<li class="${v.isNew ? "is-new" : ""}"><span class="t">$${v.display}</span><span class="c">${fmt(v.until - t)}</span></li>`)
+    .map((v) => `<li class="row${v.isNew ? " is-new" : ""}">
+        <span class="avatar" style="background:${avatarColour(v.display)}">${esc(v.display.slice(0, 2))}</span>
+        <span class="row__main"><span class="row__t">$${esc(v.display)}</span><span class="row__s">${v.flag ? `1 char off $${esc(v.flag)}` : "locked · 0.5 SOL burned"}</span></span>
+        <span class="tagp ${v.flag ? "tagp--flag" : "tagp--lock"}">${v.flag ? "flagged" : "locked"}</span>
+        <span class="row__c">${fmt(v.until - t)}</span>
+      </li>`)
     .join("");
+  if (lockedCount) lockedCount.textContent = registry.size;
 }
 
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -106,9 +120,7 @@ function line(cls, text) {
   return `<p class="${cls}">› ${text}</p>`;
 }
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const raw = form.ticker.value;
+function checkTicker(raw) {
   const n = normalise(raw);
   const lines = [];
 
@@ -132,13 +144,30 @@ form.addEventListener("submit", (e) => {
     const near = n.length >= 5
       ? [...registry.entries()].find(([k]) => editDistance(k, n) === 1)
       : null;
-    registry.set(n, { display: n, until: Date.now() + CONFIG.lockMinutes * 60e3, isNew: true });
+    registry.set(n, { display: n, until: Date.now() + CONFIG.lockMinutes * 60e3, isNew: true, flag: near ? near[1].display : null });
     lines.push(line("ok", `DEPLOYED: $${esc(n)} is now locked for ${CONFIG.lockMinutes}:00.`));
     lines.push(line("ok", `0.5 SOL routed to buy & burn $${esc(CONFIG.ticker)}.`));
     if (near) lines.push(line("bad", `Similarity flag: one character off $${esc(near[1].display)}. Shown on the coin page.`));
   }
   out.innerHTML = lines.join("");
   renderList();
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  checkTicker(form.ticker.value);
+});
+
+/* Header search: jump to the board and run the same check */
+const search = $("[data-search]");
+search?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const raw = search.q.value;
+  if (!raw.trim()) return;
+  form.ticker.value = raw;
+  checkTicker(raw);
+  search.q.value = "";
+  $("#lock").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 });
 
 /* ---------- Tick ---------- */
@@ -153,7 +182,7 @@ setInterval(tick, 1000);
 
 /* ---------- Reveal on scroll ---------- */
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const targets = $$(".section__head, .problem, .feature, .flow__node, .terminal, .token > *, .phase, .faq__list, .metrics");
+  const targets = $$(".section__head, .band__head, .card, .step, .tile, .token > *, .phase, .qa, .stat, .board");
   targets.forEach((el) => el.classList.add("reveal"));
   const io = new IntersectionObserver(
     (entries) => entries.forEach((en) => {

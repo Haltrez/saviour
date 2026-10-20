@@ -1,16 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0E0D0B"/>
-  <g stroke="#2A2722" stroke-width="1">
-    <path d="M0 105H1200M0 210H1200M0 315H1200M0 420H1200M0 525H1200"/>
-    <path d="M200 0V630M400 0V630M600 0V630M800 0V630M1000 0V630"/>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Titan+One&amp;family=IBM+Plex+Mono:wght@600&amp;display=swap');
+      .hero { font-family: 'Archivo Black', 'Arial Black', sans-serif; }
+      .disp { font-family: 'Titan One', 'Arial Black', sans-serif; }
+      .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+    </style>
+    <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#141210" fill-opacity=".16"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#F7F5EE"/>
+  <rect y="0" width="1200" height="64" fill="#FF4F00"/>
+  <rect y="64" width="1200" height="3" fill="#141210"/>
+  <text x="64" y="44" class="disp" font-size="30" fill="#141210">Saviour</text>
+
+  <!-- art tile -->
+  <rect x="848" y="148" width="312" height="312" rx="28" fill="#141210"/>
+  <rect x="840" y="140" width="312" height="312" rx="28" fill="#FF4F00" stroke="#141210" stroke-width="3"/>
+  <rect x="840" y="140" width="312" height="312" rx="28" fill="url(#dots)"/>
+  <g transform="translate(896 196) scale(3.1) rotate(-6 32 32)" fill="none">
+    <circle cx="32" cy="32" r="26" stroke="#141210" stroke-width="14"/>
+    <path d="M32 6 A26 26 0 0 1 58 32" stroke="#FF4F00" stroke-width="9"/>
+    <path d="M58 32 A26 26 0 0 1 32 58" stroke="#F7F5EE" stroke-width="9"/>
+    <path d="M32 58 A26 26 0 0 1 6 32" stroke="#FF4F00" stroke-width="9"/>
+    <path d="M6 32 A26 26 0 0 1 32 6" stroke="#F7F5EE" stroke-width="9"/>
   </g>
-  <g transform="translate(890 170) scale(4.4)" fill="none" stroke-width="10">
-    <path d="M32 6 A26 26 0 0 1 58 32" stroke="#FF4F00"/>
-    <path d="M58 32 A26 26 0 0 1 32 58" stroke="#EDE6D6"/>
-    <path d="M32 58 A26 26 0 0 1 6 32" stroke="#FF4F00"/>
-    <path d="M6 32 A26 26 0 0 1 32 6" stroke="#EDE6D6"/>
+  <g transform="rotate(-7 880 170) translate(40 20)">
+    <rect x="762" y="128" width="200" height="44" rx="22" fill="#141210"/>
+    <rect x="758" y="124" width="200" height="44" rx="22" fill="#fff" stroke="#141210" stroke-width="2.5"/>
+    <text x="858" y="153" text-anchor="middle" class="mono" font-size="18" fill="#141210">0.5 SOL → BURN</text>
   </g>
-  <text x="80" y="300" fill="#EDE6D6" font-family="Georgia, serif" font-size="112">Saviour</text>
-  <text x="84" y="370" fill="#FF4F00" font-family="monospace" font-size="24" letter-spacing="3">THE LAUNCHPAD THAT SAVES THE TRENCHES</text>
-  <text x="84" y="520" fill="#8F877A" font-family="monospace" font-size="22" letter-spacing="2">0.5 SOL DEPLOY → BURNED · 30 MIN TICKER LOCK · NO BUNDLES</text>
+
+  <!-- headline -->
+  <text x="64" y="236" class="hero" font-size="80" fill="#141210" letter-spacing="-2">LET'S</text>
+  <rect x="71" y="261" width="252" height="82" rx="8" fill="#141210"/>
+  <rect x="64" y="254" width="252" height="82" rx="8" fill="#FF4F00"/>
+  <text x="74" y="324" class="hero" font-size="80" fill="#141210" letter-spacing="-2">SAVE</text>
+  <text x="64" y="424" class="hero" font-size="80" fill="#141210" letter-spacing="-2">THE TRENCHES.</text>
+
+  <text x="64" y="540" class="mono" font-size="22" fill="#736F65">0.5 SOL DEPLOY BURNED · 30 MIN TICKER LOCK · NO BUNDLES</text>
 </svg>

@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saviour: The launchpad that saves the trenches</title>
+  <meta name="description" content="Saviour is a Solana launchpad built against bundles, vamps and ticker races. Every deploy costs 0.5 SOL, used to buy and burn $SAVIOUR. Tickers lock for 30 minutes.">
+  <meta name="theme-color" content="#0E0D0B">
+  <meta property="og:title" content="Saviour: The launchpad that saves the trenches">
+  <meta property="og:description" content="0.5 SOL deploy fee, bought and burned. 30-minute ticker lock. No bundles, no vamps.">
+  <meta property="og:image" content="assets/og.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav" id="top">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top" aria-label="Saviour home">
+        <img src="assets/logo.svg" alt="" width="28" height="28">
+        <span>Saviour</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#problem">Problem</a>
+        <a href="#protocol">Protocol</a>
+        <a href="#lock">Ticker Lock</a>
+        <a href="#token">Token</a>
+        <a href="#roadmap">Roadmap</a>
+      </nav>
+      <div class="nav__cta">
+        <button class="ca" type="button" data-copy-ca aria-label="Copy contract address">
+          <span class="ca__label">CA</span>
+          <span class="ca__value" data-ca-short>Soon</span>
+        </button>
+        <a class="btn btn--accent btn--sm" data-link="pump" href="#" target="_blank" rel="noopener">Buy <span data-ticker>$SAVIOUR</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero__grid">
+        <div class="hero__copy">
+          <p class="eyebrow"><span class="dot"></span> Solana launchpad · Built against the trenches</p>
+          <h1 class="display">The launchpad that <em>saves</em> the trenches.</h1>
+          <p class="lede">Bundles, vamps and ten copies of the same ticker in the same minute. Saviour sets protocol rules that make the worst plays expensive or impossible, and every deploy buys and burns <span data-ticker>$SAVIOUR</span>.</p>
+          <div class="hero__actions">
+            <a class="btn btn--accent" data-link="pump" href="#" target="_blank" rel="noopener">Buy on pump.fun</a>
+            <a class="btn btn--ghost" href="docs/LITEPAPER.md">Read the litepaper</a>
+          </div>
+        </div>
+
+        <aside class="readout" aria-label="Protocol parameters">
+          <div class="readout__head">
+            <span>PROTOCOL READOUT</span>
+            <span class="readout__status"><span class="pulse"></span>SPEC v0.1</span>
+          </div>
+          <dl class="readout__rows">
+            <div><dt>Deploy fee</dt><dd><strong>0.5</strong> SOL</dd><span class="tag">100% → buy &amp; burn</span></div>
+            <div><dt>Ticker lock</dt><dd><strong data-clock>30:00</strong></dd><span class="tag">per normalised ticker</span></div>
+            <div><dt>Fair Start window</dt><dd><strong>45</strong> s</dd><span class="tag">single-price batch</span></div>
+            <div><dt>Same-block dev bundles</dt><dd><strong>0</strong></dd><span class="tag">rejected onchain</span></div>
+          </dl>
+          <div class="readout__ring" aria-hidden="true">
+            <svg viewBox="0 0 64 64"><g fill="none" stroke-width="3">
+              <circle cx="32" cy="32" r="29" stroke="var(--line-2)"/>
+              <path class="ring-sweep" d="M32 3 A29 29 0 0 1 61 32" stroke="var(--accent)"/>
+            </g></svg>
+            <span>burn<br>engine</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>NO BUNDLES</span><i>✕</i><span>NO VAMPS</span><i>✕</i><span>NO TICKER RACES</span><i>✕</i><span>0.5 SOL → BURN</span><i>✕</i><span>30 MIN TICKER LOCK</span><i>✕</i><span>ORIGIN-VERIFIED NEWS</span><i>✕</i>
+        <span>NO BUNDLES</span><i>✕</i><span>NO VAMPS</span><i>✕</i><span>NO TICKER RACES</span><i>✕</i><span>0.5 SOL → BURN</span><i>✕</i><span>30 MIN TICKER LOCK</span><i>✕</i><span>ORIGIN-VERIFIED NEWS</span><i>✕</i>
+      </div>
+    </div>
+
+    <!-- PROBLEM -->
+    <section class="section" id="problem">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="kicker">01 / The problem</p>
+          <h2 class="title">The trenches are <em>rigged</em> before the first candle.</h2>
+        </header>
+        <div class="problems">
+          <article class="problem">
+            <span class="problem__n">A</span>
+            <h3>Bundled launches</h3>
+            <p>Deployers fund a ring of wallets and buy their own coin in the launch block. Bundling tools make it one click. The chart looks organic, but the supply is already owned, and you are the exit liquidity.</p>
+          </article>
+          <article class="problem">
+            <span class="problem__n">B</span>
+            <h3>Vamp launches</h3>
+            <p>A coin gets traction and within minutes a clone appears with the same name, the same image and a better-funded bot behind it. The original community gets split and drained.</p>
+          </article>
+          <article class="problem">
+            <span class="problem__n">C</span>
+            <h3>Ticker races</h3>
+            <p>News breaks and a dozen deployers race to mint the same ticker. Most of them are bots. Buyers can't tell which coin is real, and most of them pick the wrong one.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROTOCOL -->
+    <section class="section section--rule" id="protocol">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="kicker">02 / The protocol</p>
+          <h2 class="title">Rules in the program, <em>not</em> in a tweet.</h2>
+          <p class="section__sub">Each guarantee is meant to be enforced by the Saviour program itself, so anyone can verify it onchain and no team can quietly turn it off.</p>
+        </header>
+        <div class="features">
+          <article class="feature feature--wide">
+            <span class="feature__id">S-01</span>
+            <h3>0.5 SOL deploy, bought &amp; burned</h3>
+            <p>Every launch costs 0.5 SOL. The program swaps the full amount into <span data-ticker>$SAVIOUR</span> and burns it in the same transaction. Spam launches cost real money, and the activity flows to holders as supply reduction.</p>
+          </article>
+          <article class="feature feature--wide">
+            <span class="feature__id">S-02</span>
+            <h3>30-minute ticker lock</h3>
+            <p>Once a ticker deploys, nobody can deploy it again for 30 minutes. Matching is done on a normalised form, so <code>SAV1OUR</code>, <code>$saviour</code> and Cyrillic look-alikes all count as the same ticker.</p>
+          </article>
+          <article class="feature">
+            <span class="feature__id">S-03</span>
+            <h3>Fair Start</h3>
+            <p>The first 45 seconds of every coin run as a single-price batch auction. Every buyer in the window pays the same price, so there's no first-block edge.</p>
+          </article>
+          <article class="feature">
+            <span class="feature__id">S-04</span>
+            <h3>Bundle Score</h3>
+            <p>A funding-graph scan of early buyers and wallets funded by the dev, shown as a badge on every coin before you buy.</p>
+          </article>
+          <article class="feature">
+            <span class="feature__id">S-05</span>
+            <h3>Origin badge</h3>
+            <p>News coins attach their source link. The first deploy of that source is marked Origin, and later copies are labelled as clones that link back to it.</p>
+          </article>
+          <article class="feature">
+            <span class="feature__id">S-06</span>
+            <h3>Vamp Shield</h3>
+            <p>A perceptual-hash match on the image and similarity checks on the name block near-identical clones while the original is still trending.</p>
+          </article>
+          <article class="feature feature--wide">
+            <span class="feature__id">S-07</span>
+            <h3>Declared dev buy</h3>
+            <p>The dev buy is capped, public and shown on the coin page. Dev sells are pushed to the live feed as they happen.</p>
+          </article>
+          <article class="feature feature--wide">
+            <span class="feature__id">S-08</span>
+            <h3>Snipe tax → burn</h3>
+            <p>After Fair Start, a decaying tax applies to the first minutes of trading. What it collects buys and burns <span data-ticker>$SAVIOUR</span>.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BURN ENGINE -->
+    <section class="section section--ink" id="burn">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="kicker">03 / Burn engine</p>
+          <h2 class="title">Every launch makes <span data-ticker>$SAVIOUR</span> <em>scarcer</em>.</h2>
+        </header>
+        <ol class="flow" aria-label="Deploy fee flow">
+          <li class="flow__node">
+            <span class="flow__step">01</span>
+            <strong>Creator deploys</strong>
+            <span>Pays 0.5 SOL with the create transaction.</span>
+          </li>
+          <li class="flow__node">
+            <span class="flow__step">02</span>
+            <strong>Program swaps</strong>
+            <span>The SOL market-buys <span data-ticker>$SAVIOUR</span> in the same transaction.</span>
+          </li>
+          <li class="flow__node">
+            <span class="flow__step">03</span>
+            <strong>Tokens burned</strong>
+            <span>Sent to the SPL burn instruction. They're gone, and the burn is visible on Solscan.</span>
+          </li>
+          <li class="flow__node flow__node--accent">
+            <span class="flow__step">04</span>
+            <strong>Supply falls</strong>
+            <span>More launches mean more burn. Platform usage drives supply down.</span>
+          </li>
+        </ol>
+        <div class="metrics">
+          <div class="metric"><span class="metric__label">Tokens burned</span><span class="metric__value muted">Live at launch</span></div>
+          <div class="metric"><span class="metric__label">SOL routed to burn</span><span class="metric__value muted">Live at launch</span></div>
+          <div class="metric"><span class="metric__label">Launches protected</span><span class="metric__value muted">Live at launch</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TICKER LOCK DEMO -->
+    <section class="section" id="lock">
+      <div class="wrap lock">
+        <header class="section__head">
+          <p class="kicker">04 / Try the lock</p>
+          <h2 class="title">Try to deploy a <em>locked</em> ticker.</h2>
+          <p class="section__sub">This is an in-browser simulation of the matching rules from the spec, not live chain data. Try <code>SAVIOUR</code>, then <code>SAV1OUR</code> or <code>$sav!our</code>.</p>
+        </header>
+
+        <div class="terminal">
+          <div class="terminal__bar">
+            <span class="terminal__dots"><i></i><i></i><i></i></span>
+            <span>saviour://ticker-registry <em>demo</em></span>
+          </div>
+          <form class="terminal__form" data-lock-form autocomplete="off">
+            <label for="ticker" class="sr-only">Ticker</label>
+            <span class="prompt">$</span>
+            <input id="ticker" name="ticker" maxlength="16" placeholder="ENTER TICKER" spellcheck="false">
+            <button class="btn btn--accent btn--sm" type="submit">Deploy</button>
+          </form>
+          <div class="terminal__out" data-lock-out aria-live="polite">
+            <p class="muted">› Waiting for input…</p>
+          </div>
+          <div class="terminal__registry">
+            <p class="terminal__label">Recently locked (simulated)</p>
+            <ul data-lock-list></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKEN -->
+    <section class="section section--rule" id="token">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="kicker">05 / Token</p>
+          <h2 class="title"><span data-ticker>$SAVIOUR</span>. A fair launch, <em>naturally</em>.</h2>
+          <p class="section__sub">A launchpad built against bundles has to launch clean itself. <span data-ticker>$SAVIOUR</span> launches on pump.fun with no presale, no team allocation and a public dev buy.</p>
+        </header>
+        <div class="token">
+          <dl class="token__facts">
+            <div><dt>Chain</dt><dd>Solana</dd></div>
+            <div><dt>Total supply</dt><dd>1,000,000,000</dd></div>
+            <div><dt>Presale</dt><dd>None</dd></div>
+            <div><dt>Team allocation</dt><dd>None. Dev buy disclosed</dd></div>
+            <div><dt>Launch</dt><dd>pump.fun bonding curve → PumpSwap</dd></div>
+            <div><dt>Mint &amp; freeze authority</dt><dd>Revoked (pump.fun standard)</dd></div>
+            <div class="token__ca"><dt>Contract</dt><dd><button type="button" class="ca ca--block" data-copy-ca><span class="ca__value" data-ca-full>Announced at launch</span><span class="ca__hint">Copy</span></button></dd></div>
+          </dl>
+          <div class="token__split">
+            <p class="terminal__label">Planned platform revenue routing</p>
+            <div class="bar" role="img" aria-label="Deploy fees 100 percent to burn; trading fees 50 percent burn, 30 percent treasury, 20 percent creators">
+              <div class="bar__row">
+                <span class="bar__name">Deploy fees</span>
+                <div class="bar__track"><span class="seg seg--burn" style="width:100%">100% burn</span></div>
+              </div>
+              <div class="bar__row">
+                <span class="bar__name">Trading fees</span>
+                <div class="bar__track">
+                  <span class="seg seg--burn" style="width:50%">50% burn</span>
+                  <span class="seg seg--treasury" style="width:30%">30% ops</span>
+                  <span class="seg seg--creator" style="width:20%">20%</span>
+                </div>
+              </div>
+            </div>
+            <p class="note">The trading-fee split is a proposal in the litepaper and will be fixed in the program before mainnet. The last 20% goes to coin creators.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section class="section" id="roadmap">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="kicker">06 / Roadmap</p>
+          <h2 class="title">From meme to <em>machine</em>.</h2>
+        </header>
+        <ol class="roadmap">
+          <li class="phase phase--now">
+            <div class="phase__meta"><span class="phase__n">Phase 0</span><span class="phase__state">Now</span></div>
+            <h3>Genesis</h3>
+            <ul>
+              <li>Fair launch of <span data-ticker>$SAVIOUR</span> on pump.fun</li>
+              <li>Site, litepaper and public tech spec</li>
+              <li>Community on X and Telegram, Dexscreener profile</li>
+              <li>Graduation to PumpSwap</li>
+            </ul>
+          </li>
+          <li class="phase">
+            <div class="phase__meta"><span class="phase__n">Phase 1</span><span class="phase__state">Build</span></div>
+            <h3>Devnet registry</h3>
+            <ul>
+              <li>Ticker Registry program live on devnet</li>
+              <li>Open-source normalisation library</li>
+              <li>Public demo: try to deploy a locked ticker</li>
+              <li>Bundle Score indexer in beta</li>
+            </ul>
+          </li>
+          <li class="phase">
+            <div class="phase__meta"><span class="phase__n">Phase 2</span><span class="phase__state">Ship</span></div>
+            <h3>Mainnet beta</h3>
+            <ul>
+              <li>Launchpad mainnet: 0.5 SOL buy &amp; burn, 30-min lock</li>
+              <li>Third-party program audit published</li>
+              <li>Live burn dashboard</li>
+              <li>Whitelisted creator cohort</li>
+            </ul>
+          </li>
+          <li class="phase">
+            <div class="phase__meta"><span class="phase__n">Phase 3</span><span class="phase__state">Harden</span></div>
+            <h3>Fair Start &amp; Origin</h3>
+            <ul>
+              <li>45-second single-price batch auction</li>
+              <li>Origin badges for news coins</li>
+              <li>Vamp Shield image and name matching</li>
+              <li>Snipe tax → burn</li>
+            </ul>
+          </li>
+          <li class="phase">
+            <div class="phase__meta"><span class="phase__n">Phase 4</span><span class="phase__state">Scale</span></div>
+            <h3>Saviour Terminal</h3>
+            <ul>
+              <li>Pro trading terminal with Bundle Score on every chart</li>
+              <li>Public API for bots and aggregators</li>
+              <li>Mobile app</li>
+              <li>Holder governance over protocol parameters</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--rule" id="faq">
+      <div class="wrap faq">
+        <header class="section__head">
+          <p class="kicker">07 / FAQ</p>
+          <h2 class="title">Questions from the <em>trenches</em>.</h2>
+        </header>
+        <div class="faq__list">
+          <details>
+            <summary>Why launch on pump.fun if you're competing with it?</summary>
+            <p>Because that's where the trenches are. Launching <span data-ticker>$SAVIOUR</span> there with a fair, unbundled start shows the standard we're setting, in front of the users we want to win over.</p>
+          </details>
+          <details>
+            <summary>Where does the 0.5 SOL go?</summary>
+            <p>All of it goes to buying <span data-ticker>$SAVIOUR</span> on the open market, and the tokens are burned in the same transaction. The team takes none of the deploy fee.</p>
+          </details>
+          <details>
+            <summary>Can't someone just use a slightly different ticker?</summary>
+            <p>Tickers are normalised before the lock check: case, symbols, look-alike characters such as 0/O and 1/I, and Cyrillic homoglyphs. Near-misses within one character are flagged on the coin page. A ticker that's genuinely different is allowed through, which is the point.</p>
+          </details>
+          <details>
+            <summary>Doesn't the lock let one person squat a ticker?</summary>
+            <p>Squatting costs 0.5 SOL every 30 minutes, and all of it is burned. Squatters end up funding the burn. Origin badges also let the real news coin stand out.</p>
+          </details>
+          <details>
+            <summary>Is the launchpad live?</summary>
+            <p>Not yet. The roadmap above shows where we are. The token comes first, then the devnet registry, then mainnet. We'll ship in public and won't announce dates we can't meet.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+      <div class="wrap cta__inner">
+        <img src="assets/logo.svg" alt="" width="72" height="72" class="cta__mark">
+        <h2 class="display display--sm">Pull the trenches out of the <em>water</em>.</h2>
+        <div class="hero__actions">
+          <a class="btn btn--accent" data-link="pump" href="#" target="_blank" rel="noopener">Buy <span data-ticker>$SAVIOUR</span></a>
+          <a class="btn btn--ghost" data-link="x" href="#" target="_blank" rel="noopener">Follow on X</a>
+          <a class="btn btn--ghost" data-link="telegram" href="#" target="_blank" rel="noopener">Telegram</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="24" height="24"><span>Saviour</span></a>
+        <p class="muted">The launchpad that saves the trenches.</p>
+      </div>
+      <nav class="footer__links" aria-label="Footer">
+        <a data-link="pump" href="#" target="_blank" rel="noopener">pump.fun</a>
+        <a data-link="dex" href="#" target="_blank" rel="noopener">Dexscreener</a>
+        <a data-link="x" href="#" target="_blank" rel="noopener">X</a>
+        <a data-link="telegram" href="#" target="_blank" rel="noopener">Telegram</a>
+        <a href="docs/LITEPAPER.md">Litepaper</a>
+        <a href="docs/TECH_SPEC.md">Tech spec</a>
+      </nav>
+      <p class="footer__legal">
+        <span data-ticker>$SAVIOUR</span> is a memecoin with no intrinsic value or expectation of financial return. Nothing on this site is financial advice. Features described are in development and may change. Crypto assets are highly volatile, so only spend what you can afford to lose.
+      </p>
+    </div>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
+  <script src="main.js" defer></script>
+</body>
+</html>

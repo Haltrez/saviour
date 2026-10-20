@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0E0D0B"/>
+  <g stroke="#2A2722" stroke-width="1">
+    <path d="M0 105H1200M0 210H1200M0 315H1200M0 420H1200M0 525H1200"/>
+    <path d="M200 0V630M400 0V630M600 0V630M800 0V630M1000 0V630"/>
+  </g>
+  <g transform="translate(890 170) scale(4.4)" fill="none" stroke-width="10">
+    <path d="M32 6 A26 26 0 0 1 58 32" stroke="#FF4F00"/>
+    <path d="M58 32 A26 26 0 0 1 32 58" stroke="#EDE6D6"/>
+    <path d="M32 58 A26 26 0 0 1 6 32" stroke="#FF4F00"/>
+    <path d="M6 32 A26 26 0 0 1 32 6" stroke="#EDE6D6"/>
+  </g>
+  <text x="80" y="300" fill="#EDE6D6" font-family="Georgia, serif" font-size="112">Saviour</text>
+  <text x="84" y="370" fill="#FF4F00" font-family="monospace" font-size="24" letter-spacing="3">THE LAUNCHPAD THAT SAVES THE TRENCHES</text>
+  <text x="84" y="520" fill="#8F877A" font-family="monospace" font-size="22" letter-spacing="2">0.5 SOL DEPLOY → BURNED · 30 MIN TICKER LOCK · NO BUNDLES</text>
+</svg>

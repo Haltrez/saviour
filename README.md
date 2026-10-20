@@ -61,14 +61,6 @@ Playful launchpad style (chunky type, pill controls, hard offset shadows, cream 
 
 Type: **Archivo Black** (uppercase hero), **Titan One** (display headings), **Plus Jakarta Sans** (UI), **IBM Plex Mono** (data), **Shantell Sans** (hand-drawn notes).
 
----|---|---|
-| Ink | `#0E0D0B` | Background |
-| Bone | `#EDE6D6` | Text |
-| Rescue orange | `#FF4F00` | The only accent: CTAs, emphasis, burn |
-| Graphite | `#2A2722` / `#3A362F` / `#8F877A` | Lines and muted text |
-
-Type: **Instrument Serif** (display), **Geist** (UI), **Geist Mono** (data and labels).
-
 ---
 
 `$SAVIOUR` is a memecoin with no intrinsic value or expectation of financial return. Nothing here is financial advice.

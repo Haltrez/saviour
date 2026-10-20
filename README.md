@@ -15,6 +15,7 @@
 | [`docs/LITEPAPER.md`](docs/LITEPAPER.md) | Product, rules, feature ideas, revenue routing, roadmap |
 | [`docs/TECH_SPEC.md`](docs/TECH_SPEC.md) | How the launchpad is built: Anchor accounts, instructions, indexer |
 | [`docs/LAUNCH_PLAYBOOK.md`](docs/LAUNCH_PLAYBOOK.md) | Step-by-step pump.fun launch and 30-day growth plan |
+| [`docs/LAUNCHPAD_BUILD_PLAN.md`](docs/LAUNCHPAD_BUILD_PLAN.md) | Plan for the working launchpad: 0.5 SOL fee, auto burn, ticker lock on Meteora DBC |
 
 ## Going live
 

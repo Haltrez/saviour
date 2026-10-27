@@ -1,0 +1,19 @@
+{
+  "name": "saviour-splitter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Watch a hub wallet and split incoming SOL into fresh wallets worth a fixed USD amount each",
+  "scripts": {
+    "init": "node split.js init",
+    "split": "node split.js split",
+    "watch": "node split.js watch"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

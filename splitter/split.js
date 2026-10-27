@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Saviour splitter: send SOL to the hub wallet, and it gets split into
-// fresh wallets that each hold USD_PER_WALLET worth of SOL (default $2).
+// fresh wallets that each hold USD_PER_WALLET worth of SOL (default $1.20).
 //
 //   node split.js init               create the hub wallet and print its address
 //   node split.js split [--dry-run]  split whatever the hub holds right now
@@ -8,7 +8,7 @@
 //
 // Env:
 //   RPC_URL         default https://api.mainnet-beta.solana.com
-//   USD_PER_WALLET  default 2
+//   USD_PER_WALLET  default 1.2
 //   SOL_PRICE_USD   fixed price override (skips the price API)
 //   POLL_SECONDS    default 15 (watch mode)
 
@@ -31,7 +31,7 @@ const HUB_PATH = path.join(DIR, "hub-keypair.json");
 const WALLETS_DIR = path.join(DIR, "wallets");
 
 const RPC_URL = process.env.RPC_URL || "https://api.mainnet-beta.solana.com";
-const USD_PER_WALLET = Number(process.env.USD_PER_WALLET || 2);
+const USD_PER_WALLET = Number(process.env.USD_PER_WALLET || 1.2);
 const POLL_SECONDS = Number(process.env.POLL_SECONDS || 15);
 const DRY_RUN = process.argv.includes("--dry-run");
 

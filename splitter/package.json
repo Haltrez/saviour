@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Watch a hub wallet and split incoming SOL into fresh wallets worth a fixed USD amount each",
+  "description": "Watch a hub wallet and split incoming SOL into fresh wallets worth a fixed USD amount each (default $1.20)",
   "scripts": {
     "init": "node split.js init",
     "split": "node split.js split",

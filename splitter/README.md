@@ -37,3 +37,38 @@ node split.js watch             # keep polling and split every new deposit
 ## Keys
 
 `hub-keypair.json` and `wallets/` hold private keys. They are gitignored and written with `0600` permissions. Back them up somewhere safe; anyone with these files can spend the funds.
+
+# Gradual airdrop
+
+`airdrop.js` sends each address in your recipient list exactly **$1.30 worth of a token**, one recipient every set interval. The value is taken from the token's market price at send time. The hub buys the token through Jupiter when it doesn't already hold enough. Fund the hub with SOL first (`node split.js init` prints its address).
+
+```bash
+# recipients.txt: one wallet address per line, # for comments
+MINT=<token CA> node airdrop.js once --dry-run   # show the next drop and the buy it needs
+MINT=<token CA> INTERVAL_MINUTES=30 node airdrop.js run
+MINT=<token CA> node airdrop.js status
+```
+
+| Env | Default | What |
+|---|---|---|
+| `MINT` | (required) | Token contract address |
+| `RECIPIENTS` | `recipients.txt` | Address list; duplicates are skipped and bad addresses stop the run before anything is sent |
+| `USD_PER_DROP` | `1.3` | Dollar value each recipient gets |
+| `INTERVAL_MINUTES` | `60` | Time between drops |
+| `BUY_AHEAD` | `10` | Buy enough token for this many drops per swap |
+| `SLIPPAGE_BPS` | `300` | Max slippage on the buy (3%) |
+| `BUY_BUFFER` | `0.05` | Extra bought to cover slippage; leftovers go into later drops |
+| `MAX_PRIORITY_LAMPORTS` | `10000` | Cap on the swap's priority fee |
+
+Progress is saved to `airdrop-state.json`, so a restart picks up at the next recipient and never pays anyone twice.
+
+## Costs per drop
+
+| Cost | Amount | When |
+|---|---|---|
+| Transfer fee | 5000 lamports (~$0.0005) | Every drop |
+| Swap fee + priority | ≤ ~15000 lamports (~$0.0015) | Once per `BUY_AHEAD` drops |
+| Recipient's token account | ~0.0015 SOL (~$0.15), stays in the recipient's account | Only if the recipient has never held this token |
+| DEX/pool fee + slippage | ~0.25–1% of the buy | Built into the swap price |
+
+The network fees come to well under $0.01 per drop. The one cost that isn't near zero is the recipient's token account. Solana charges this deposit the first time a wallet holds a given token, and the sender has to pay it. Nothing can avoid it, but it's charged once per recipient, not once per drop.

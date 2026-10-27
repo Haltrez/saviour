@@ -1,3 +1,5 @@
 node_modules/
 hub-keypair.json
 wallets/
+airdrop-state.json
+recipients.txt

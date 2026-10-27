@@ -40,11 +40,12 @@ node split.js watch             # keep polling and split every new deposit
 
 # Gradual airdrop
 
-`airdrop.js` sends each address in your recipient list exactly **$1.30 worth of a token**, one recipient every set interval. The value is taken from the token's market price at send time. The hub buys the token through Jupiter when it doesn't already hold enough. Fund the hub with SOL first (`node split.js init` prints its address).
+`airdrop.js` sends each address in your recipient list exactly **$1.10 worth of a token**, valued at the token's market price at send time. It goes to one recipient every set interval, **plus enough SOL for that recipient to sell it**. The hub buys the token through Jupiter when it doesn't already hold enough. Fund the hub with SOL first (`node split.js init` prints its address).
 
 ```bash
 # recipients.txt: one wallet address per line, # for comments
-MINT=<token CA> node airdrop.js once --dry-run   # show the next drop and the buy it needs
+MINT=<token CA> node airdrop.js budget            # how much SOL to send the hub
+MINT=<token CA> node airdrop.js once --dry-run    # show the next drop and the buy it needs
 MINT=<token CA> INTERVAL_MINUTES=30 node airdrop.js run
 MINT=<token CA> node airdrop.js status
 ```
@@ -53,7 +54,8 @@ MINT=<token CA> node airdrop.js status
 |---|---|---|
 | `MINT` | (required) | Token contract address |
 | `RECIPIENTS` | `recipients.txt` | Address list; duplicates are skipped and bad addresses stop the run before anything is sent |
-| `USD_PER_DROP` | `1.3` | Dollar value each recipient gets |
+| `USD_PER_DROP` | `1.1` | Dollar value of token each recipient gets |
+| `SELL_FEE_LAMPORTS` | `50000` | Fee allowance (0.00005 SOL) included in each recipient's sell SOL |
 | `INTERVAL_MINUTES` | `60` | Time between drops |
 | `BUY_AHEAD` | `10` | Buy enough token for this many drops per swap |
 | `SLIPPAGE_BPS` | `300` | Max slippage on the buy (3%) |
@@ -62,13 +64,29 @@ MINT=<token CA> node airdrop.js status
 
 Progress is saved to `airdrop-state.json`, so a restart picks up at the next recipient and never pays anyone twice.
 
-## Costs per drop
+## SOL for selling
 
-| Cost | Amount | When |
-|---|---|---|
-| Transfer fee | 5000 lamports (~$0.0005) | Every drop |
-| Swap fee + priority | ≤ ~15000 lamports (~$0.0015) | Once per `BUY_AHEAD` drops |
-| Recipient's token account | ~0.0015 SOL (~$0.15), stays in the recipient's account | Only if the recipient has never held this token |
-| DEX/pool fee + slippage | ~0.25–1% of the buy | Built into the swap price |
+A wallet with no SOL can't sell. A sell through Jupiter briefly opens a wrapped-SOL account, pays a fee, and has to leave the wallet at or above Solana's minimum balance. So each recipient is topped up to:
 
-The network fees come to well under $0.01 per drop. The one cost that isn't near zero is the recipient's token account. Solana charges this deposit the first time a wallet holds a given token, and the sender has to pay it. Nothing can avoid it, but it's charged once per recipient, not once per drop.
+| | SOL |
+|---|---|
+| Wallet minimum balance | ~0.00089 |
+| Temporary wrapped-SOL account (returned when the sell closes it) | ~0.00149 |
+| Sell fee allowance (`SELL_FEE_LAMPORTS`) | 0.00005 |
+| **Total** | **~0.0022 SOL (~$0.22)** |
+
+The amounts are read live from the network. A recipient who already holds that much SOL gets nothing extra, and one holding part of it gets only the difference.
+
+## What to send the hub
+
+`node airdrop.js budget` reads every remaining recipient's wallet and adds up the exact cost. At SOL ≈ $100, a drop to a brand-new wallet costs:
+
+| Cost | ~USD |
+|---|---|
+| Token ($1.10 + 5% buy buffer) | $1.155 |
+| Recipient's token account (one-time, if they've never held the token) | $0.15 |
+| SOL to sell with (if their wallet is empty) | $0.22 |
+| Transfer + swap fees | < $0.01 |
+| **Per drop** | **~$1.53** |
+
+There is also a one-time hub reserve of ~0.0036 SOL (~$0.36). Recipients who already hold the token or some SOL cost less, down to about $1.16.

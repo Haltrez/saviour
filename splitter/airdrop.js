@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Saviour gradual airdrop: fund the hub with SOL, and every INTERVAL_MINUTES
 // it sends the next recipient on your list exactly USD_PER_DROP worth of a
-// token (default $1.30, valued at the token's market price at send time).
-// It buys the token through Jupiter when the hub doesn't already hold enough.
+// token (default $1.10, valued at the token's market price at send time),
+// plus enough SOL for them to sell it. It buys the token through Jupiter when
+// the hub doesn't already hold enough.
 //
+//   node airdrop.js budget            how much SOL the hub needs for the remaining drops
 //   node airdrop.js run [--dry-run]   drop to one recipient every interval
 //   node airdrop.js once [--dry-run]  drop to the next recipient and exit
 //   node airdrop.js status            show progress
@@ -13,7 +15,8 @@
 // Env:
 //   MINT              token contract address (required)
 //   RECIPIENTS        file with one wallet address per line (default recipients.txt)
-//   USD_PER_DROP      default 1.3
+//   USD_PER_DROP      default 1.1
+//   SELL_FEE_LAMPORTS fee allowance each recipient gets for selling, default 50000
 //   INTERVAL_MINUTES  default 60
 //   SLIPPAGE_BPS      default 300 (3%)
 //   BUY_BUFFER        extra fraction bought to cover slippage, default 0.05
@@ -27,6 +30,7 @@ import {
   Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
+  SystemProgram,
   Transaction,
   VersionedTransaction,
   sendAndConfirmTransaction,
@@ -34,7 +38,9 @@ import {
 import {
   createAssociatedTokenAccountIdempotentInstruction,
   createTransferCheckedInstruction,
+  getAccountLenForMint,
   getAssociatedTokenAddressSync,
+  getMint,
 } from "@solana/spl-token";
 import fs from "node:fs";
 import path from "node:path";
@@ -47,7 +53,8 @@ const STATE_PATH = path.join(DIR, "airdrop-state.json");
 const RPC_URL = process.env.RPC_URL || "https://api.mainnet-beta.solana.com";
 const MINT = process.env.MINT;
 const RECIPIENTS = path.resolve(process.env.RECIPIENTS || path.join(DIR, "recipients.txt"));
-const USD_PER_DROP = Number(process.env.USD_PER_DROP || 1.3);
+const USD_PER_DROP = Number(process.env.USD_PER_DROP || 1.1);
+const SELL_FEE_LAMPORTS = Number(process.env.SELL_FEE_LAMPORTS || 50000);
 const INTERVAL_MINUTES = Number(process.env.INTERVAL_MINUTES || 60);
 const SLIPPAGE_BPS = Number(process.env.SLIPPAGE_BPS || 300);
 const BUY_BUFFER = Number(process.env.BUY_BUFFER || 0.05);
@@ -57,6 +64,8 @@ const DRY_RUN = process.argv.includes("--dry-run");
 
 const SOL_MINT = "So11111111111111111111111111111111111111112";
 const JUP = "https://lite-api.jup.ag";
+const TX_FEE = 5000; // lamports, one signature
+const TOKEN_ACCOUNT_LEN = 165; // a classic SPL token account, e.g. wrapped SOL
 
 const connection = new Connection(RPC_URL, "confirmed");
 
@@ -107,11 +116,33 @@ async function prices() {
   return { sol, token };
 }
 
-// Mint decimals and owning program (classic SPL Token or Token-2022).
+// Mint decimals, owning program (classic SPL Token or Token-2022) and the
+// rent a holder's token account for it costs.
 async function mintInfo(mint) {
-  const acc = await connection.getParsedAccountInfo(mint);
-  if (!acc.value) throw new Error(`Mint ${mint.toBase58()} not found`);
-  return { decimals: acc.value.data.parsed.info.decimals, programId: acc.value.owner };
+  const acc = await connection.getAccountInfo(mint);
+  if (!acc) throw new Error(`Mint ${mint.toBase58()} not found`);
+  const info = await getMint(connection, mint, "confirmed", acc.owner);
+  const ataRent = await connection.getMinimumBalanceForRentExemption(getAccountLenForMint(info));
+  return { decimals: info.decimals, programId: acc.owner, ataRent };
+}
+
+// SOL a recipient must hold to sell: a sell opens a temporary wrapped-SOL
+// account (its rent comes back when it closes in the same transaction), pays
+// fees, and must leave the wallet at or above the rent-exempt minimum.
+async function sellReserve() {
+  const [walletMin, wsolRent] = await Promise.all([
+    connection.getMinimumBalanceForRentExemption(0),
+    connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_LEN),
+  ]);
+  return walletMin + wsolRent + SELL_FEE_LAMPORTS;
+}
+
+async function accountsExist(keys) {
+  const out = [];
+  for (let i = 0; i < keys.length; i += 100) {
+    out.push(...(await connection.getMultipleAccountsInfo(keys.slice(i, i + 100))));
+  }
+  return out;
 }
 
 async function tokenBalance(owner, mint, programId) {
@@ -171,13 +202,16 @@ async function dropOnce() {
 
   const { decimals, programId } = await mintInfo(mint);
   const price = await prices();
+  const owner = new PublicKey(next);
+  const topUp = Math.max(0, (await sellReserve()) - (await connection.getBalance(owner)));
   // Exactly USD_PER_DROP at the current market price, in base units.
   const amount = BigInt(Math.floor((USD_PER_DROP / price.token) * 10 ** decimals));
   const have = await tokenBalance(hub.publicKey, mint, programId);
 
   console.log(
     `Next: ${next}. $${USD_PER_DROP} = ${Number(amount) / 10 ** decimals} tokens ` +
-      `(token $${price.token}, SOL $${price.sol}). Hub holds ${Number(have) / 10 ** decimals}.`,
+      `+ ${topUp / LAMPORTS_PER_SOL} SOL for selling (token $${price.token}, SOL $${price.sol}). ` +
+      `Hub holds ${Number(have) / 10 ** decimals} tokens.`,
   );
 
   let buySig = null;
@@ -198,19 +232,22 @@ async function dropOnce() {
   }
   if (DRY_RUN) return true;
 
-  const owner = new PublicKey(next);
   const from = getAssociatedTokenAddressSync(mint, hub.publicKey, true, programId);
   const to = getAssociatedTokenAddressSync(mint, owner, true, programId);
   const tx = new Transaction().add(
     createAssociatedTokenAccountIdempotentInstruction(hub.publicKey, to, owner, mint, programId),
     createTransferCheckedInstruction(from, mint, to, hub.publicKey, amount, decimals, [], programId),
   );
+  if (topUp > 0) {
+    tx.add(SystemProgram.transfer({ fromPubkey: hub.publicKey, toPubkey: owner, lamports: topUp }));
+  }
   const sig = await sendAndConfirmTransaction(connection, tx, [hub]);
 
   state.drops[next] = {
     amount: amount.toString(),
     usd: USD_PER_DROP,
     tokenPriceUsd: price.token,
+    solTopUpLamports: topUp,
     buySignature: buySig,
     signature: sig,
     at: new Date().toISOString(),
@@ -234,6 +271,60 @@ async function run() {
   }
 }
 
+// Total SOL the hub needs for every remaining drop, checked against each
+// recipient's actual wallet: existing token accounts and SOL balances lower it.
+async function budget() {
+  if (!MINT) throw new Error("Set MINT to the token contract address");
+  const hub = loadHub();
+  const mint = new PublicKey(MINT);
+  const state = loadState();
+  const left = loadRecipients().filter((r) => !state.drops[r]).map((r) => new PublicKey(r));
+  const [{ ataRent, decimals, programId }, price, reserve, walletMin, wsolRent] = await Promise.all([
+    mintInfo(mint),
+    prices(),
+    sellReserve(),
+    connection.getMinimumBalanceForRentExemption(0),
+    connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_LEN),
+  ]);
+
+  const wallets = await accountsExist(left);
+  const atas = await accountsExist(
+    left.map((o) => getAssociatedTokenAddressSync(mint, o, true, programId)),
+  );
+  const perDropToken = Math.ceil(((USD_PER_DROP * (1 + BUY_BUFFER)) / price.sol) * LAMPORTS_PER_SOL);
+  const newAtas = atas.filter((a) => !a).length;
+  const topUps = wallets.reduce((sum, w) => sum + Math.max(0, reserve - (w?.lamports ?? 0)), 0);
+  const swaps = Math.ceil(left.length / BUY_AHEAD);
+
+  const hubToken = await tokenBalance(hub.publicKey, mint, programId);
+  const hubTokenLamports = Math.floor(
+    ((Number(hubToken) / 10 ** decimals) * price.token / price.sol) * LAMPORTS_PER_SOL,
+  );
+  const hubAtaExists = (await connection.getAccountInfo(
+    getAssociatedTokenAddressSync(mint, hub.publicKey, true, programId),
+  )) !== null;
+
+  const lines = [
+    [`Token: ${left.length} x $${USD_PER_DROP} (+${BUY_BUFFER * 100}% buy buffer)`, perDropToken * left.length],
+    [`Recipient token accounts: ${newAtas} new`, newAtas * ataRent],
+    [`SOL to sell with: ${wallets.filter((w) => (w?.lamports ?? 0) < reserve).length} wallets topped up`, topUps],
+    [`Transfer fees: ${left.length} drops`, left.length * TX_FEE],
+    [`Swap fees: ${swaps} swaps`, swaps * (TX_FEE + MAX_PRIORITY_LAMPORTS)],
+    [`Hub reserve (own minimum, token account, temporary wSOL)`, walletMin + (hubAtaExists ? 0 : ataRent) + wsolRent],
+    [`Token the hub already holds`, -hubTokenLamports],
+  ];
+  const total = lines.reduce((s, [, l]) => s + l, 0);
+  const hubSol = await connection.getBalance(hub.publicKey);
+  const fmt = (l) => `${(l / LAMPORTS_PER_SOL).toFixed(6)} SOL  $${((l / LAMPORTS_PER_SOL) * price.sol).toFixed(2)}`;
+
+  console.log(`Budget for ${left.length} remaining drops (SOL $${price.sol.toFixed(2)}):`);
+  for (const [label, l] of lines) console.log(`  ${label.padEnd(58)} ${fmt(l)}`);
+  console.log(`  ${"Total".padEnd(58)} ${fmt(total)}`);
+  if (left.length) console.log(`  ${"Per drop".padEnd(58)} ${fmt(total / left.length)}`);
+  console.log(`Hub ${hub.publicKey.toBase58()} holds ${fmt(hubSol)}.`);
+  console.log(hubSol >= total ? "Enough for every drop." : `Send ${fmt(total - hubSol)} more.`);
+}
+
 function status() {
   const recipients = loadRecipients();
   const state = loadState();
@@ -241,10 +332,10 @@ function status() {
   console.log(`${done}/${recipients.length} recipients dropped for ${MINT}`);
 }
 
-const commands = { run, once: dropOnce, status };
+const commands = { budget, run, once: dropOnce, status };
 const cmd = process.argv[2];
 if (!commands[cmd]) {
-  console.log("Usage: MINT=<ca> node airdrop.js <run|once|status> [--dry-run]");
+  console.log("Usage: MINT=<ca> node airdrop.js <budget|run|once|status> [--dry-run]");
   process.exit(1);
 }
 Promise.resolve(commands[cmd]()).catch((err) => {
